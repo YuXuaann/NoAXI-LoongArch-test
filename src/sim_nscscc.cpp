@@ -261,6 +261,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     // cemu {
     memory_bus cemu_mmio;
 
+    // mmio : 把外设的空间映射到物理空间
     mmio_mem cemu_func_mem(262144 * 4, "./test-set/test_bin/main.bin");
     cemu_func_mem.set_allow_warp(true);
     assert(cemu_mmio.add_dev(0x1c000000, 0x100000, &cemu_func_mem));
@@ -315,8 +316,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     for (int test = test_start; test <= test_end && running; test++)
     {
         bool test_end = false;
-        // confreg.set_switch(test);
-        // cemu_confreg.set_switch(test);
+        confreg.set_switch(test);
+        cemu_confreg.set_switch(test);
         top->aresetn = 0;
         std::stringstream ss;
         ss << "trace-perf-" << test << ".vcd";
