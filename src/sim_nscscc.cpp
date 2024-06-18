@@ -301,6 +301,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     uint64_t ticks = 0;
     // rtl soc-simulator }
 
+    int dut_scores[10] = {0};
+
     if (only_cemu)
     {
         printf("\e[32mOnly CEMU\e[0m\n");
@@ -330,6 +332,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
 
     // add by Yu_Xuaan
     uint64_t last_commit_pc = 0;
+    uint64_t inst_count = 0;
 
     for (int test = test_start; test <= test_end && running; test++)
     {
@@ -423,6 +426,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                     {
                         cemu_la32r.set_GPR(cemu_la32r.debug_wb_wnum, top->debug_wb_rf_wdata);
                     }
+                    inst_count++;
                 }
                 last_commit = ticks;
 
@@ -483,9 +487,30 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
         if (trace_on)
             vcd.close();
         printf("\e[34mgetnum: %x\e[0m\n", confreg.get_num());
+        dut_scores[test - 1] = confreg.get_num();
     }
     top->final();
     printf("\e[34mtotal ticks = %lu\e[0m\n", ticks);
+
+    static const int ref_scores[10] = {
+        0x13CF7FA, 0x7BDD47E, 0x10CE6772, 0xAA1AA5C, 0x1FC00D8,
+        0x719615A, 0x6E0009A, 0x74B8B20,  0x853B00,  0x50A1BCC,
+    };
+    double mulscores = 1;
+    printf("==================scores===================\n");
+    for (int test = test_start; test <= test_end; test++) {
+        printf("%.3f\n", ref_scores[test - 1] * 1.0 / dut_scores[test - 1]);
+        mulscores *= ref_scores[test - 1] * 1.0 / dut_scores[test - 1];
+    }
+    if (test_end) {
+        printf("scores = %.3f\n", std::pow(mulscores, 0.1));
+    }
+    printf("=================IPC=====================\n");
+    printf("total insts = %lu\n", inst_count);
+    printf("total ticks = %lu\n", ticks);
+    printf("IPC = %.3f\n", inst_count * 1.0 / ticks);
+    printf("=========================================\n");
+    printf("\e[34mperf test done!\e[0m\n");
 }
 
 void ucore_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref)

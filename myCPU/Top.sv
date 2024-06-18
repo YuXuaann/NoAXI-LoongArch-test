@@ -2050,8 +2050,6 @@ module Alu(	// @[src/main/scala/pipelines/3.execute/alu.scala:19:7]
       : io_func_type == 4'h1 | io_func_type == 4'h3 ? _add_result_T : 32'h0;	// @[src/main/scala/pipelines/3.execute/alu.scala:19:7, :22:28, :23:28, :25:40, :26:33, :28:28, :29:28, :30:28, :32:28, :33:28, :34:36, :45:26, :54:{21,38,54,76}, :55:15, :56:{27,45}, :57:15, :58:{27,45}, :59:15, :61:15, src/main/scala/resources/functions/Functions.scala:77:28]
 endmodule
 
-// external module SignedMul
-
 module Mul(	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
   input         clock,	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
                 reset,	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
@@ -2063,9 +2061,22 @@ module Mul(	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
   output        io_complete	// @[src/main/scala/pipelines/3.execute/mul.scala:32:14]
 );
 
-  wire [65:0] _signed_mul_P;	// @[src/main/scala/pipelines/3.execute/mul.scala:35:28]
-  wire        _io_result_T_4 = io_op_type == 2'h0;	// @[src/main/scala/pipelines/3.execute/mul.scala:38:55]
-  wire        _GEN = io_op_type == 2'h2 | _io_result_T_4;	// @[src/main/scala/pipelines/3.execute/mul.scala:38:{21,41,55}]
+  reg  [32:0] casez_tmp;	// @[src/main/scala/resources/functions/Functions.scala:77:28]
+  wire [63:0] _signed_result_T_2 =
+    {{32{io_src1[31]}}, io_src1} * {{32{io_src2[31]}}, io_src2};	// @[src/main/scala/pipelines/3.execute/mul.scala:57:43]
+  wire [63:0] unsigned_result = {32'h0, io_src1} * {32'h0, io_src2};	// @[src/main/scala/pipelines/3.execute/mul.scala:58:35]
+  always_comb begin	// @[src/main/scala/resources/functions/Functions.scala:77:28]
+    casez (io_op_type)	// @[src/main/scala/resources/functions/Functions.scala:77:28]
+      2'b00:
+        casez_tmp = _signed_result_T_2[32:0];	// @[src/main/scala/pipelines/3.execute/mul.scala:57:{43,61}, :64:41, src/main/scala/resources/functions/Functions.scala:77:28]
+      2'b01:
+        casez_tmp = {1'h0, unsigned_result[31:0]};	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7, :58:35, :66:43, src/main/scala/resources/functions/Functions.scala:77:28]
+      2'b10:
+        casez_tmp = {1'h0, _signed_result_T_2[63:32]};	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7, :57:{43,61}, :63:41, src/main/scala/resources/functions/Functions.scala:77:28]
+      default:
+        casez_tmp = {1'h0, unsigned_result[63:32]};	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7, :58:35, :65:43, src/main/scala/resources/functions/Functions.scala:77:28]
+    endcase	// @[src/main/scala/resources/functions/Functions.scala:77:28]
+  end // always_comb
   reg         running_lock;	// @[src/main/scala/pipelines/3.execute/mul.scala:71:29]
   wire        running = ~running_lock & io_running;	// @[src/main/scala/pipelines/3.execute/mul.scala:71:29, :72:33, :74:22, :75:13]
   always @(posedge clock) begin	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
@@ -2092,23 +2103,9 @@ module Mul(	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
       `FIRRTL_AFTER_INITIAL	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
     `endif // FIRRTL_AFTER_INITIAL
   `endif // ENABLE_INITIAL_REG_
-  SignedMul signed_mul (	// @[src/main/scala/pipelines/3.execute/mul.scala:35:28]
-    .CLK (clock),
-    .CE  (1'h1),	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7]
-    .A   ({_GEN & io_src1[31], io_src1}),	// @[src/main/scala/pipelines/3.execute/mul.scala:38:{41,75}, :39:{23,29,37}, :42:{23,29}]
-    .B   ({_GEN & io_src2[31], io_src2}),	// @[src/main/scala/pipelines/3.execute/mul.scala:38:{41,75}, :40:{23,29,37}, :43:{23,29}]
-    .P   (_signed_mul_P)
-  );	// @[src/main/scala/pipelines/3.execute/mul.scala:35:28]
-  assign io_result =
-    io_op_type == 2'h1
-      ? _signed_mul_P[31:0]
-      : (&io_op_type) | ~_io_result_T_4 ? _signed_mul_P[63:32] : _signed_mul_P[31:0];	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7, :35:28, :38:55, :50:43, :51:43, :53:43, src/main/scala/resources/functions/Functions.scala:77:28]
+  assign io_result = casez_tmp[31:0];	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7, :59:15, src/main/scala/resources/functions/Functions.scala:77:28]
   assign io_complete = ~running;	// @[src/main/scala/pipelines/3.execute/mul.scala:31:7, :72:33, :74:22, :75:13, :77:18]
 endmodule
-
-// external module SignedDiv
-
-// external module UnsignedDiv
 
 module Div(	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
   input         clock,	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
@@ -2121,103 +2118,53 @@ module Div(	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
   output        io_complete	// @[src/main/scala/pipelines/3.execute/div.scala:70:14]
 );
 
-  wire        _unsigned_div_s_axis_dividend_tready;	// @[src/main/scala/pipelines/3.execute/div.scala:74:30]
-  wire        _unsigned_div_s_axis_divisor_tready;	// @[src/main/scala/pipelines/3.execute/div.scala:74:30]
-  wire        _unsigned_div_m_axis_dout_tvalid;	// @[src/main/scala/pipelines/3.execute/div.scala:74:30]
-  wire [63:0] _unsigned_div_m_axis_dout_tdata;	// @[src/main/scala/pipelines/3.execute/div.scala:74:30]
-  wire        _signed_div_s_axis_dividend_tready;	// @[src/main/scala/pipelines/3.execute/div.scala:73:30]
-  wire        _signed_div_s_axis_divisor_tready;	// @[src/main/scala/pipelines/3.execute/div.scala:73:30]
-  wire        _signed_div_m_axis_dout_tvalid;	// @[src/main/scala/pipelines/3.execute/div.scala:73:30]
-  wire [63:0] _signed_div_m_axis_dout_tdata;	// @[src/main/scala/pipelines/3.execute/div.scala:73:30]
-  reg         sent_0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35]
-  reg         sent_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35]
-  wire        _signed_div_io_s_axis_dividend_tvalid_T_1 = io_running & ~sent_0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :64:{47,50}]
-  wire        _signed_div_io_s_axis_divisor_tvalid_T_1 = io_running & ~sent_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :65:{47,50}]
-  reg         sent_0_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35]
-  reg         sent_1_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35]
-  wire        _unsigned_div_io_s_axis_dividend_tvalid_T_1 = io_running & ~sent_0_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :64:{47,50}]
-  wire        _unsigned_div_io_s_axis_divisor_tvalid_T_1 = io_running & ~sent_1_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :65:{47,50}]
-  reg  [31:0] casez_tmp;	// @[src/main/scala/resources/functions/Functions.scala:77:28]
-  always_comb begin	// @[src/main/scala/resources/functions/Functions.scala:77:28]
-    casez (io_op_type)	// @[src/main/scala/resources/functions/Functions.scala:77:28]
-      2'b00:
-        casez_tmp = _unsigned_div_m_axis_dout_tdata[31:0];	// @[src/main/scala/pipelines/3.execute/div.scala:74:30, :92:60, src/main/scala/resources/functions/Functions.scala:77:28]
-      2'b01:
-        casez_tmp = _signed_div_m_axis_dout_tdata[31:0];	// @[src/main/scala/pipelines/3.execute/div.scala:73:30, :91:58, src/main/scala/resources/functions/Functions.scala:77:28]
-      2'b10:
-        casez_tmp = _unsigned_div_m_axis_dout_tdata[63:32];	// @[src/main/scala/pipelines/3.execute/div.scala:74:30, :90:60, src/main/scala/resources/functions/Functions.scala:77:28]
-      default:
-        casez_tmp = _signed_div_m_axis_dout_tdata[63:32];	// @[src/main/scala/pipelines/3.execute/div.scala:73:30, :89:58, src/main/scala/resources/functions/Functions.scala:77:28]
-    endcase	// @[src/main/scala/resources/functions/Functions.scala:77:28]
-  end // always_comb
+  reg  [3:0]  cnt;	// @[src/main/scala/pipelines/3.execute/div.scala:96:22]
+  reg  [31:0] quotient;	// @[src/main/scala/pipelines/3.execute/div.scala:119:28]
+  reg  [31:0] remainder;	// @[src/main/scala/pipelines/3.execute/div.scala:120:28]
+  wire [31:0] dividend_abs = io_src1[31] & io_op_type[0] ? 32'h0 - io_src1 : io_src1;	// @[src/main/scala/pipelines/3.execute/div.scala:107:{34,39}, :110:{27,46}, src/main/scala/resources/isa/op_type.scala:50:48]
+  wire [31:0] divisor_abs = io_src2[31] & io_op_type[0] ? 32'h0 - io_src2 : io_src2;	// @[src/main/scala/pipelines/3.execute/div.scala:108:{34,39}, :111:{27,45}, src/main/scala/resources/isa/op_type.scala:50:48]
+  wire [31:0] quotient_abs = dividend_abs / divisor_abs;	// @[src/main/scala/pipelines/3.execute/div.scala:110:27, :111:27, :116:38]
+  wire [31:0] _remainder_abs_T_1 = dividend_abs - quotient_abs * divisor_abs;	// @[src/main/scala/pipelines/3.execute/div.scala:110:27, :111:27, :116:38, :117:{38,53}]
   always @(posedge clock) begin	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
     if (reset) begin	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
-      sent_0 <= 1'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
-      sent_1 <= 1'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
-      sent_0_1 <= 1'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
-      sent_1_1 <= 1'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
+      cnt <= 4'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:96:22]
+      quotient <= 32'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:119:28]
+      remainder <= 32'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:120:28]
     end
-    else begin	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
-      sent_0 <=
-        _signed_div_io_s_axis_dividend_tvalid_T_1 & _signed_div_s_axis_dividend_tready
-        | ~_signed_div_m_axis_dout_tvalid & sent_0;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :52:{37,68}, :53:15, :54:40, :55:15, :64:47, :73:30]
-      sent_1 <=
-        _signed_div_io_s_axis_divisor_tvalid_T_1 & _signed_div_s_axis_divisor_tready
-        | ~_signed_div_m_axis_dout_tvalid & sent_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :54:40, :55:15, :58:{36,66}, :59:15, :60:40, :61:15, :65:47, :73:30]
-      sent_0_1 <=
-        _unsigned_div_io_s_axis_dividend_tvalid_T_1 & _unsigned_div_s_axis_dividend_tready
-        | ~_unsigned_div_m_axis_dout_tvalid & sent_0_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :52:{37,68}, :53:15, :54:40, :55:15, :64:47, :74:30]
-      sent_1_1 <=
-        _unsigned_div_io_s_axis_divisor_tvalid_T_1 & _unsigned_div_s_axis_divisor_tready
-        | ~_unsigned_div_m_axis_dout_tvalid & sent_1_1;	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :54:40, :55:15, :58:{36,66}, :59:15, :60:40, :61:15, :65:47, :74:30]
+    else if (io_running) begin	// @[src/main/scala/pipelines/3.execute/div.scala:70:14]
+      cnt <= cnt + 4'h1;	// @[src/main/scala/pipelines/3.execute/div.scala:96:22, :100:29]
+      quotient <=
+        (io_src1[31] ^ io_src2[31]) & io_op_type[0] ? 32'h0 - quotient_abs : quotient_abs;	// @[src/main/scala/pipelines/3.execute/div.scala:107:34, :108:34, :113:{41,56}, :116:38, :119:28, :123:{23,42}, src/main/scala/resources/isa/op_type.scala:50:48]
+      remainder <=
+        io_src1[31] & io_op_type[0] ? 32'h0 - _remainder_abs_T_1 : _remainder_abs_T_1;	// @[src/main/scala/pipelines/3.execute/div.scala:107:34, :114:40, :117:38, :120:28, :124:{23,43}, src/main/scala/resources/isa/op_type.scala:50:48]
     end
+    else if (cnt[3])	// @[src/main/scala/pipelines/3.execute/div.scala:96:22, :127:24]
+      cnt <= 4'h0;	// @[src/main/scala/pipelines/3.execute/div.scala:96:22]
   end // always @(posedge)
   `ifdef ENABLE_INITIAL_REG_	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
     `ifdef FIRRTL_BEFORE_INITIAL	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
       `FIRRTL_BEFORE_INITIAL	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
     `endif // FIRRTL_BEFORE_INITIAL
-    logic [31:0] _RANDOM[0:0];	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
+    logic [31:0] _RANDOM[0:2];	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
     initial begin	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
       `ifdef INIT_RANDOM_PROLOG_	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
         `INIT_RANDOM_PROLOG_	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
       `endif // INIT_RANDOM_PROLOG_
       `ifdef RANDOMIZE_REG_INIT	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
-        _RANDOM[/*Zero width*/ 1'b0] = `RANDOM;	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
-        sent_0 = _RANDOM[/*Zero width*/ 1'b0][0];	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
-        sent_1 = _RANDOM[/*Zero width*/ 1'b0][1];	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
-        sent_0_1 = _RANDOM[/*Zero width*/ 1'b0][2];	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
-        sent_1_1 = _RANDOM[/*Zero width*/ 1'b0][3];	// @[src/main/scala/pipelines/3.execute/div.scala:50:35, :69:7]
+        for (logic [1:0] i = 2'h0; i < 2'h3; i += 2'h1) begin
+          _RANDOM[i] = `RANDOM;	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
+        end	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
+        cnt = _RANDOM[2'h0][3:0];	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, :96:22]
+        quotient = {_RANDOM[2'h0][31:4], _RANDOM[2'h1][3:0]};	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, :96:22, :119:28]
+        remainder = {_RANDOM[2'h1][31:4], _RANDOM[2'h2][3:0]};	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, :119:28, :120:28]
       `endif // RANDOMIZE_REG_INIT
     end // initial
     `ifdef FIRRTL_AFTER_INITIAL	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
       `FIRRTL_AFTER_INITIAL	// @[src/main/scala/pipelines/3.execute/div.scala:69:7]
     `endif // FIRRTL_AFTER_INITIAL
   `endif // ENABLE_INITIAL_REG_
-  SignedDiv signed_div (	// @[src/main/scala/pipelines/3.execute/div.scala:73:30]
-    .aclk                   (clock),
-    .s_axis_dividend_tvalid (_signed_div_io_s_axis_dividend_tvalid_T_1),	// @[src/main/scala/pipelines/3.execute/div.scala:64:47]
-    .s_axis_dividend_tready (_signed_div_s_axis_dividend_tready),
-    .s_axis_dividend_tdata  (io_src1),
-    .s_axis_divisor_tvalid  (_signed_div_io_s_axis_divisor_tvalid_T_1),	// @[src/main/scala/pipelines/3.execute/div.scala:65:47]
-    .s_axis_divisor_tready  (_signed_div_s_axis_divisor_tready),
-    .s_axis_divisor_tdata   (io_src2),
-    .m_axis_dout_tvalid     (_signed_div_m_axis_dout_tvalid),
-    .m_axis_dout_tdata      (_signed_div_m_axis_dout_tdata)
-  );	// @[src/main/scala/pipelines/3.execute/div.scala:73:30]
-  UnsignedDiv unsigned_div (	// @[src/main/scala/pipelines/3.execute/div.scala:74:30]
-    .aclk                   (clock),
-    .s_axis_dividend_tvalid (_unsigned_div_io_s_axis_dividend_tvalid_T_1),	// @[src/main/scala/pipelines/3.execute/div.scala:64:47]
-    .s_axis_dividend_tready (_unsigned_div_s_axis_dividend_tready),
-    .s_axis_dividend_tdata  (io_src1),
-    .s_axis_divisor_tvalid  (_unsigned_div_io_s_axis_divisor_tvalid_T_1),	// @[src/main/scala/pipelines/3.execute/div.scala:65:47]
-    .s_axis_divisor_tready  (_unsigned_div_s_axis_divisor_tready),
-    .s_axis_divisor_tdata   (io_src2),
-    .m_axis_dout_tvalid     (_unsigned_div_m_axis_dout_tvalid),
-    .m_axis_dout_tdata      (_unsigned_div_m_axis_dout_tdata)
-  );	// @[src/main/scala/pipelines/3.execute/div.scala:74:30]
-  assign io_result = casez_tmp;	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, src/main/scala/resources/functions/Functions.scala:77:28]
-  assign io_complete =
-    io_op_type[0] ? _signed_div_m_axis_dout_tvalid : _unsigned_div_m_axis_dout_tvalid;	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, :73:30, :74:30, :79:23, src/main/scala/resources/isa/op_type.scala:50:48]
+  assign io_result = io_op_type == 2'h0 | io_op_type == 2'h1 ? remainder : quotient;	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, :119:28, :120:28, src/main/scala/resources/functions/Functions.scala:77:28]
+  assign io_complete = cnt[3];	// @[src/main/scala/pipelines/3.execute/div.scala:69:7, :96:22, :127:24]
 endmodule
 
 module Bru(	// @[src/main/scala/pipelines/3.execute/bru.scala:19:7]

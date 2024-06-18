@@ -1,0 +1,3 @@
+obj_dir
+*.vcd
+test-set/golden_trace/cemu_golden_trace.txt
