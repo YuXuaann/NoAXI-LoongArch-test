@@ -17,6 +17,10 @@
 #include <thread>
 #include <csignal>
 #include <sstream>
+#include <map>
+#include <unordered_map>
+
+FILE *inst_file = fopen("test-set/inst/insts.txt", "w");
 
 bool only_cemu = false;
 
@@ -261,6 +265,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     // cemu {
     memory_bus cemu_mmio;
 
+    // mmio : 把外设的空间映射到物理空间
     mmio_mem cemu_func_mem(262144 * 4, "./test-set/test_bin/main.bin");
     cemu_func_mem.set_allow_warp(true);
     assert(cemu_mmio.add_dev(0x1c000000, 0x100000, &cemu_func_mem));
@@ -275,7 +280,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     // rtl soc-simulator {
     axi4<32, 32, 4> mmio_sigs;
     axi4_ref<32, 32, 4> mmio_sigs_ref(mmio_sigs);
-    axi4_xbar<32, 32, 4> mmio(axi_fast ? 0 : 23);
+    axi4_xbar<32, 32, 4> mmio(axi_fast ? 0 : 2);
 
     // perf mem at 0x1fc00000
     mmio_mem perf_mem(262144 * 4, "./test-set/test_bin/main.bin");
@@ -296,33 +301,51 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     uint64_t ticks = 0;
     // rtl soc-simulator }
 
+    int dut_scores[10] = {0};
+
     if (only_cemu)
     {
         printf("\e[32mOnly CEMU\e[0m\n");
-        cemu_confreg.set_switch(0);
-        cemu_la32r.reset();
-        for (int i = 1; i <= 1000000; i++)
+        for (int test = test_start; test <= test_end && running; test++)
         {
-            cemu_la32r.step();
-            cemu_confreg.tick();
+            cemu_confreg.set_switch(test);
+            cemu_la32r.reset();
+            bool test_end = false;
+            while (!test_end)
+            {
+                cemu_la32r.step();
+                cemu_confreg.tick();
+                if (cemu_la32r.debug_wb_pc == 0x1c000100u)
+                {
+                    test_end = true;
+                }
+            }
+            printf("\e[34mpass test: %d\e[0m\n", test);
         }
+        for (const auto &pair : cemu_la32r.count_inst)
+        {
+            fprintf(inst_file, "%-10s %d\n", pair.first, pair.second);
+        }
+        fprintf(inst_file, "two mem count: %d\n", cemu_la32r.two_mem_count);
         return;
     }
 
     // add by Yu_Xuaan
     uint64_t last_commit_pc = 0;
+    int inst_count = 0;
+    int cycles = 0;
 
     for (int test = test_start; test <= test_end && running; test++)
     {
         bool test_end = false;
-        // confreg.set_switch(test);
-        // cemu_confreg.set_switch(test);
+        confreg.set_switch(test);
+        cemu_confreg.set_switch(test);
         top->aresetn = 0;
         std::stringstream ss;
         ss << "trace-perf-" << test << ".vcd";
         if (trace_on)
             vcd.open(ss.str().c_str());
-        uint64_t rst_ticks = 1000;
+        uint64_t rst_ticks = 100;
         uint64_t last_commit = ticks;
         uint64_t commit_timeout = 10000;
         cemu_la32r.reset();
@@ -337,6 +360,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
             else
                 top->aresetn = 1;
             top->aclk = !top->aclk;
+            if (top->aclk)
+                cycles++;
             if (top->aclk && top->aresetn)
                 mmio_sigs.update_input(mmio_ref);
             top->eval();
@@ -349,7 +374,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 while (confreg_uart && confreg.has_uart())
                     printf("%c", confreg.get_uart());
             }
-            if (top->debug_wb_pc == 0x1c000100u)
+            if (top->aresetn && top->debug_wb_pc == 0x1c000100u)
             {
                 printf("\e[32mTest PASS !!!\e[0m\n");
                 test_end = true;
@@ -367,6 +392,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 {
                     cemu_la32r.step();
                     cemu_confreg.tick();
+                    inst_count++;
                 } while (!(cemu_la32r.debug_wb_we && cemu_la32r.debug_wb_wnum));
                 if (cemu_la32r.debug_wb_pc != top->debug_wb_pc ||
                     cemu_la32r.debug_wb_wnum != top->debug_wb_rf_wnum ||
@@ -378,22 +404,22 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                     printf("mycpu    : PC = %08x, wb_rf_wnum = %02x, wb_rf_wdata = %08x\e[0m\n", top->debug_wb_pc, top->debug_wb_rf_wnum, top->debug_wb_rf_wdata);
                     printf("--------------------------------------------------------------------------at hex-\n");
                     running = false;
-                    FILE *fp = fopen("/mnt/f/CPU/lab_Loongarch/mycpu_env/func/obj/test.s", "r");
-                    char inst[100];
-                    while (fscanf(fp, "%s", inst) != EOF)
-                    {
-                        uint32_t inst_pc = strtoul(inst, NULL, 16);
-                        if (inst_pc == cemu_la32r.debug_wb_pc)
-                        {
-                            auto _a = fscanf(fp, "%s", inst);
-                            _a = fscanf(fp, "%s", inst);
-                            printf("PC = %08x-", cemu_la32r.debug_wb_pc);
-                            printf("--inst: \e[31m%s", inst);
-                            _a = fscanf(fp, "%s", inst);
-                            printf(" %s\e[0m\n", inst);
-                            break;
-                        }
-                    }
+                    // FILE *fp = fopen("/mnt/f/CPU/lab_Loongarch/mycpu_env/func/obj/test.s", "r");
+                    // char inst[100];
+                    // while (fscanf(fp, "%s", inst) != EOF)
+                    // {
+                    //     uint32_t inst_pc = strtoul(inst, NULL, 16);
+                    //     if (inst_pc == cemu_la32r.debug_wb_pc)
+                    //     {
+                    //         auto _a = fscanf(fp, "%s", inst);
+                    //         _a = fscanf(fp, "%s", inst);
+                    //         printf("PC = %08x-", cemu_la32r.debug_wb_pc);
+                    //         printf("--inst: \e[31m%s", inst);
+                    //         _a = fscanf(fp, "%s", inst);
+                    //         printf(" %s\e[0m\n", inst);
+                    //         break;
+                    //     }
+                    // }
                 }
                 else
                 {
@@ -408,32 +434,37 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 last_commit = ticks;
 
                 //------------------------------------------------------------------debug_commit--------------------------------------------------------------------
-                /*
-                while(cemu_la32r.debug_wb_pc == last_commit_pc)
-                {
-                    cemu_la32r.step();
-                    cemu_confreg.tick();
-                }
-                if (cemu_la32r.debug_wb_pc != top->debug_wb_pc ||
-                    ((cemu_la32r.debug_wb_wnum != top->debug_wb_rf_wnum ||
-                      (cemu_la32r.debug_wb_wdata != top->debug_wb_rf_wdata && !cemu_la32r.debug_wb_is_timer)) &&
-                     cemu_la32r.debug_wb_wnum != 0))
-                {
-                    printf("Error!\n");
-                    printf("reference: PC = 0x%08x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%08x\n", cemu_la32r.debug_wb_pc, cemu_la32r.debug_wb_wnum, cemu_la32r.debug_wb_wdata);
-                    printf("mycpu    : PC = 0x%08x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%08x\n", top->debug_wb_pc, top->debug_wb_rf_wnum, top->debug_wb_rf_wdata);
-                    running = false;
-                }
-                else
-                {
-                    if (cemu_la32r.debug_wb_is_timer)
-                    {
-                        cemu_la32r.set_GPR(cemu_la32r.debug_wb_wnum, top->debug_wb_rf_wdata);
-                    }
-                }
-                last_commit = ticks;
-                last_commit_pc = cemu_la32r.debug_wb_pc;
-                */
+
+                // do
+                // {
+                //     cemu_la32r.step();
+                //     cemu_confreg.tick();
+                // } while (!(cemu_la32r.debug_wb_we && cemu_la32r.debug_wb_wnum));
+                // while(cemu_la32r.debug_wb_pc == last_commit_pc)
+                // {
+                //     cemu_la32r.step();
+                //     cemu_confreg.tick();
+                // }
+                // if (cemu_la32r.debug_wb_pc != top->debug_wb_pc ||
+                //     ((cemu_la32r.debug_wb_wnum != top->debug_wb_rf_wnum ||
+                //       (cemu_la32r.debug_wb_wdata != top->debug_wb_rf_wdata && !cemu_la32r.debug_wb_is_timer)) &&
+                //      cemu_la32r.debug_wb_wnum != 0))
+                // {
+                //     printf("Error!\n");
+                //     printf("reference: PC = 0x%08x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%08x\n", cemu_la32r.debug_wb_pc, cemu_la32r.debug_wb_wnum, cemu_la32r.debug_wb_wdata);
+                //     printf("mycpu    : PC = 0x%08x, wb_rf_wnum = 0x%02x, wb_rf_wdata = 0x%08x\n", top->debug_wb_pc, top->debug_wb_rf_wnum, top->debug_wb_rf_wdata);
+                //     running = false;
+                // }
+                // else
+                // {
+                //     if (cemu_la32r.debug_wb_is_timer)
+                //     {
+                //         cemu_la32r.set_GPR(cemu_la32r.debug_wb_wnum, top->debug_wb_rf_wdata);
+                //     }
+                // }
+                // last_commit = ticks;
+                // last_commit_pc = cemu_la32r.debug_wb_pc;
+
                 //------------------------------------------------------------------debug_commit--------------------------------------------------------------------
             }
 
@@ -459,9 +490,40 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
         if (trace_on)
             vcd.close();
         printf("\e[34mgetnum: %x\e[0m\n", confreg.get_num());
+        dut_scores[test - 1] = confreg.get_num();
     }
     top->final();
     printf("\e[34mtotal ticks = %lu\e[0m\n", ticks);
+
+    static const int ref_scores[10] = {
+        0x13CF7FA,
+        0x7BDD47E,
+        0x10CE6772,
+        0xAA1AA5C,
+        0x1FC00D8,
+        0x719615A,
+        0x6E0009A,
+        0x74B8B20,
+        0x853B00,
+        0x50A1BCC,
+    };
+    double mulscores = 1;
+    printf("==================scores===================\n");
+    for (int test = test_start; test <= test_end; test++)
+    {
+        printf("%.3f\n", ref_scores[test - 1] * 1.0 / dut_scores[test - 1]);
+        mulscores *= ref_scores[test - 1] * 1.0 / dut_scores[test - 1];
+    }
+    if (test_end)
+    {
+        printf("scores = %.3f\n", std::pow(mulscores, 0.1));
+    }
+    printf("=================IPC=====================\n");
+    printf("total insts  = %lu\n", inst_count);
+    printf("total cycles = %lu\n", cycles);
+    printf("IPC = %.4f\n", inst_count * 1.0 / cycles);
+    printf("=========================================\n");
+    printf("\e[34mperf test done!\e[0m\n");
 }
 
 void ucore_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref)

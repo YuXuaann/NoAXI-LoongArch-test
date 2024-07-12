@@ -13,7 +13,7 @@ trace: obj_dir/V$(TOP_NAME)
 	./obj_dir/Vmycpu_top -func -trace 1000000000
 
 func: obj_dir/V$(TOP_NAME)
-	./obj_dir/Vmycpu_top -perfdiff -uart -prog 1 -trace 1000000000
+	./obj_dir/Vmycpu_top -perfdiff -uart -trace 1000000000
 
 func_cemu: obj_dir/V$(TOP_NAME)
 	./obj_dir/Vmycpu_top -perfdiff -uart -onlycemu -trace 1000000000 

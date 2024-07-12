@@ -36,6 +36,7 @@
 class nscscc_confreg : public mmio_dev
 {
 public:
+    unsigned int timer;
     unsigned int confreg_read = 0;
     unsigned int confreg_write = 0;
     nscscc_confreg(bool simulation = false)
@@ -277,7 +278,6 @@ private:
     uint32_t cr[8];
     unsigned int switch_data;
     unsigned int switch_inter_data;
-    unsigned int timer;
     unsigned int led;
     unsigned int led_rg0;
     unsigned int led_rg1;

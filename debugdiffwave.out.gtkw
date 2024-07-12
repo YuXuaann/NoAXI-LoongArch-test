@@ -1,209 +1,266 @@
 [*]
 [*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
-[*] Thu Jun  6 07:23:52 2024
+[*] Fri Jul 12 05:11:06 2024
 [*]
-[dumpfile] "/home/yuxuaan/test/soc-simulator-axi/trace-perf-1.vcd"
-[dumpfile_mtime] "Thu Jun  6 07:23:23 2024"
-[dumpfile_size] 176434
-[savefile] "/home/yuxuaan/test/soc-simulator-axi/debugdiffwave.out.gtkw"
-[timestart] 1049
-[size] 2548 1335
-[pos] 196447 196447
-*-3.000000 1058 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[dumpfile] "/home/yuxuaan/NoAXI-LoongArch/NoAXI-LoongArch-CPU-OOO/NoAXI-LoongArch-CPU/soc-simulator-axi/trace-perf-1.vcd"
+[dumpfile_mtime] "Fri Jul 12 04:59:06 2024"
+[dumpfile_size] 568775
+[savefile] "/home/yuxuaan/NoAXI-LoongArch/NoAXI-LoongArch-CPU-OOO/NoAXI-LoongArch-CPU/soc-simulator-axi/debugdiffwave.out.gtkw"
+[timestart] 138
+[size] 2548 1402
+[pos] 515407 556978
+*-1.581364 141 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TOP.
 [treeopen] TOP.mycpu_top.
 [treeopen] TOP.mycpu_top.core.
-[treeopen] TOP.mycpu_top.core.dCache.
-[treeopen] TOP.mycpu_top.core.DecoderTop.
 [treeopen] TOP.mycpu_top.core.FetchTop.
-[treeopen] TOP.mycpu_top.core.MemoryTop.
-[sst_width] 420
-[signals_width] 675
+[treeopen] TOP.mycpu_top.core.InstBuffer.
+[sst_width] 387
+[signals_width] 711
 [sst_expanded] 1
-[sst_vpaned_height] 603
-@c00200
--axi
+[sst_vpaned_height] 635
 @28
-TOP.mycpu_top.core.AXILayer.io_to_ar_ready
-TOP.mycpu_top.core.AXILayer.io_to_ar_valid
-@22
-[color] 5
-TOP.mycpu_top.core.AXILayer.io_to_ar_bits_addr[31:0]
-@28
-TOP.mycpu_top.core.AXILayer.io_to_r_ready
-TOP.mycpu_top.core.AXILayer.io_to_r_valid
-TOP.mycpu_top.core.AXILayer.io_to_r_bits_last
-@22
-TOP.mycpu_top.core.AXILayer.io_to_r_bits_data[31:0]
-@28
-TOP.mycpu_top.core.AXILayer.io_to_aw_valid
-TOP.mycpu_top.core.AXILayer.io_to_aw_ready
-@22
-[color] 5
-TOP.mycpu_top.core.AXILayer.io_to_aw_bits_addr[31:0]
-@28
-TOP.mycpu_top.core.AXILayer.io_to_w_valid
-TOP.mycpu_top.core.AXILayer.io_to_w_ready
-@22
-TOP.mycpu_top.core.AXILayer.io_to_w_bits_data[31:0]
-@28
-TOP.mycpu_top.core.AXILayer.io_to_b_valid
-@22
-TOP.mycpu_top.core.AXILayer.io_to_w_bits_strb[3:0]
-@1401200
--axi
+TOP.mycpu_top.aresetn
+TOP.mycpu_top.aclk
 @800200
--icache
-@24
+-PreFetch
+@22
 [color] 2
-TOP.mycpu_top.core.iCache.state[1:0]
-@23
-TOP.mycpu_top.core.iCache.addr[31:0]
-@1000200
--icache
-@c00200
--dcache
-@24
-[color] 2
-TOP.mycpu_top.core.dCache.state[2:0]
-@28
-TOP.mycpu_top.core.dCache.bufferEmpty
-TOP.mycpu_top.core.dCache.bufferFull
-TOP.mycpu_top.core.dCache.sb
-[color] 7
-TOP.mycpu_top.core.dCache.wstate
-@800200
--read
-@24
-[color] 2
-TOP.mycpu_top.core.dCache.state[2:0]
-@800200
--ar
-@28
-TOP.mycpu_top.core.dCache.io_axi_ar_ready
-TOP.mycpu_top.core.dCache.io_axi_ar_valid
-@22
-TOP.mycpu_top.core.dCache.io_axi_ar_bits_addr[31:0]
-@1000200
--ar
-@800200
--r
-@28
-TOP.mycpu_top.core.dCache.io_axi_r_ready
-TOP.mycpu_top.core.dCache.io_axi_r_valid
-TOP.mycpu_top.core.dCache.io_axi_r_bits_last
-@22
-TOP.mycpu_top.core.dCache.io_axi_r_bits_data[31:0]
-@1000200
--r
++{prefetch PC} TOP.mycpu_top.core.PrefetchTop.pc[31:0]
 @200
--
+-predict failed / exception
+@28
+TOP.mycpu_top.core.PrefetchTop.io_bpu_train_isbr
+TOP.mycpu_top.core.PrefetchTop.io_predictRes_br_en
+TOP.mycpu_top.core.PrefetchTop.io_bpu_train_realDirection
+@22
+TOP.mycpu_top.core.PrefetchTop.io_bpu_train_pc[31:0]
+TOP.mycpu_top.core.PrefetchTop.io_predictRes_br_tar[31:0]
+@200
+-BPU
+@28
+TOP.mycpu_top.core.PrefetchTop.io_bpu_stall
+TOP.mycpu_top.core.PrefetchTop.io_bpu_nextPC_en
+@22
+TOP.mycpu_top.core.PrefetchTop.io_bpu_nextPC_tar[31:0]
+@200
+-send to next
+@28
+TOP.mycpu_top.core.PrefetchTop.io_to_bits_bits_0_predict_en
+@22
+TOP.mycpu_top.core.PrefetchTop.io_to_bits_bits_0_predict_tar[31:0]
 @1000200
--read
-@c00200
--write
--aw
-@28
-TOP.mycpu_top.core.dCache.io_axi_aw_ready
-TOP.mycpu_top.core.dCache.io_axi_aw_valid
-@22
-TOP.mycpu_top.core.dCache.io_axi_aw_bits_len[7:0]
-TOP.mycpu_top.core.dCache.io_axi_aw_bits_addr[31:0]
-@1401200
--aw
-@c00200
--w
-@22
-TOP.mycpu_top.core.dCache.io_axi_w_bits_strb[3:0]
-@28
-TOP.mycpu_top.core.dCache.io_axi_w_valid
-TOP.mycpu_top.core.dCache.io_axi_w_ready
-TOP.mycpu_top.core.dCache.io_axi_w_bits_last
-@22
-TOP.mycpu_top.core.dCache.io_axi_w_bits_data[31:0]
-@1401200
--w
--write
--dcache
+-PreFetch
 @800200
--fetch
-@22
+-Fetch
+@c00022
 [color] 2
-TOP.mycpu_top.core.FetchTop.PC.pc[31:0]
++{fetch PC} TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
 @28
-TOP.mycpu_top.core.FetchTop.io_iCache_request_valid
+(0)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(1)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(2)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(3)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(4)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(5)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(6)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(7)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(8)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(9)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(10)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(11)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(12)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(13)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(14)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(15)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(16)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(17)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(18)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(19)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(20)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(21)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(22)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(23)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(24)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(25)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(26)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(27)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(28)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(29)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(30)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+(31)TOP.mycpu_top.core.FetchTop.from_1_bits_0_pc[31:0]
+@1401200
+-group_end
+@200
+-I-Cache
+@28
++{request_valid} TOP.mycpu_top.core.FetchTop.io_iCache_request_valid
++{answer_valid} TOP.mycpu_top.core.FetchTop.io_iCache_answer_valid
 @22
-TOP.mycpu_top.core.FetchTop.io_iCache_answer_bits[31:0]
-TOP.mycpu_top.core.FetchTop.io_iCache_request_bits[31:0]
++{inst0} TOP.mycpu_top.core.FetchTop.io_iCache_answer_bits_0[31:0]
++{inst1} TOP.mycpu_top.core.FetchTop.io_iCache_answer_bits_1[31:0]
++{inst2} TOP.mycpu_top.core.FetchTop.io_iCache_answer_bits_2[31:0]
++{inst3} TOP.mycpu_top.core.FetchTop.io_iCache_answer_bits_3[31:0]
+@200
+-send to next
+@28
+TOP.mycpu_top.core.FetchTop.io_to_bits_bits_0_instGroupValid_0
+TOP.mycpu_top.core.FetchTop.io_to_bits_bits_0_instGroupValid_1
+@22
+TOP.mycpu_top.core.FetchTop.io_to_bits_bits_0_instGroup_0[31:0]
+TOP.mycpu_top.core.FetchTop.io_to_bits_bits_0_instGroup_1[31:0]
 @1000200
--fetch
+-Fetch
 @c00200
--decoder
+-PreDecode
 @22
 [color] 2
-TOP.mycpu_top.core.DecoderTop.info_pc[31:0]
-TOP.mycpu_top.core.DecoderTop.info_inst[31:0]
++{predecode PC} TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_pc[31:0]
+@200
+-predict check
+@c00022
+TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
 @28
-TOP.mycpu_top.core.DecoderTop.io_forward_ans_notld
-@22
-TOP.mycpu_top.core.DecoderTop.rj[4:0]
-TOP.mycpu_top.core.DecoderTop.rk[4:0]
-TOP.mycpu_top.core.DecoderTop.rd[4:0]
-TOP.mycpu_top.core.DecoderTop.io_to_bits_rj[31:0]
+(0)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(1)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(2)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(3)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(4)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(5)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(6)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(7)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(8)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(9)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(10)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(11)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(12)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(13)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(14)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(15)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(16)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(17)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(18)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(19)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(20)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(21)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(22)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(23)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(24)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(25)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(26)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(27)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(28)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(29)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(30)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
+(31)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_0[31:0]
 @1401200
--decoder
+-group_end
+@c00022
+TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+@28
+(0)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(1)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(2)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(3)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(4)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(5)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(6)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(7)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(8)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(9)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(10)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(11)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(12)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(13)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(14)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(15)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(16)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(17)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(18)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(19)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(20)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(21)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(22)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(23)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(24)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(25)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(26)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(27)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(28)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(29)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(30)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+(31)TOP.mycpu_top.core.PreDecodeTop.from_1_bits_0_instGroup_1[31:0]
+@1401200
+-group_end
+@28
++{isbr} TOP.mycpu_top.core.PreDecodeTop.io_predictRes_isbr
+TOP.mycpu_top.core.PreDecodeTop.io_predictRes_isbr
++{predict failed} TOP.mycpu_top.core.PreDecodeTop.io_predictRes_br_en
++{realDirection} TOP.mycpu_top.core.PreDecodeTop.io_predictRes_realDirection
+@22
++{readlTarget} TOP.mycpu_top.core.PreDecodeTop.io_predictRes_br_tar[31:0]
+@1401200
+-PreDecode
 @c00200
--exe
-@22
-[color] 2
-TOP.mycpu_top.core.ExecuteTop.info_pc[31:0]
-@28
-TOP.mycpu_top.core.ExecuteTop.io_dcache_request_valid
-@22
-TOP.mycpu_top.core.ExecuteTop.io_dcache_request_bits_addr[31:0]
-@1401200
--exe
-@c00200
--mem
-@22
-[color] 2
-TOP.mycpu_top.core.MemoryTop.info_pc[31:0]
-@28
-TOP.mycpu_top.core.MemoryTop.io_dCache_request_valid
-TOP.mycpu_top.core.MemoryTop.io_dCache_request_bits_we
-@22
-TOP.mycpu_top.core.dCache.io_mem_request_bits_strb[7:0]
-@28
-TOP.mycpu_top.core.MemoryTop.busy
-@22
-TOP.mycpu_top.core.MemoryTop.io_dCache_request_bits_addr[31:0]
-TOP.mycpu_top.core.MemoryTop.io_dCache_request_bits_data[31:0]
-@28
-[color] 6
-TOP.mycpu_top.core.MemoryTop.io_dCache_answer_valid
-@22
-[color] 6
-TOP.mycpu_top.core.MemoryTop.io_dCache_answer_bits[31:0]
-@28
-TOP.mycpu_top.core.MemoryTop.finish
-TOP.mycpu_top.core.MemoryTop.io_load_complete
-TOP.mycpu_top.core.MemoryTop.io_forward_data_we
-@22
-TOP.mycpu_top.core.MemoryTop.to_info_result[31:0]
-TOP.mycpu_top.core.MemoryTop.io_forward_data_data[31:0]
-@1401200
--mem
+-Inst Buffer
 @800200
--debug
-@22
-[color] 2
-TOP.mycpu_top.core.WriteBackTop.io_debug_wb_pc[31:0]
-TOP.mycpu_top.core.WriteBackTop.io_debug_wb_rf_we[3:0]
+-mem_pc
 @24
-TOP.mycpu_top.core.WriteBackTop.io_debug_wb_rf_wnum[4:0]
+[color] 3
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.pushPtr[2:0]
+[color] 3
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.popPtr[2:0]
 @22
-TOP.mycpu_top.core.WriteBackTop.io_debug_wb_rf_wdata[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_0_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_1_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_2_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_3_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_4_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_5_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_6_pc[31:0]
+TOP.mycpu_top.core.InstBuffer.MultiPortFifo.mem_7_pc[31:0]
 @1000200
--debug
+-mem_pc
+@1401200
+-Inst Buffer
+@c00200
+-Decode
+@22
+[color] 2
+TOP.mycpu_top.core.DecodeTop.from_1_bits_0_pc[31:0]
+TOP.mycpu_top.core.DecodeTop.from_1_bits_0_inst[31:0]
+[color] 2
+TOP.mycpu_top.core.DecodeTop.from_1_bits_1_pc[31:0]
+TOP.mycpu_top.core.DecodeTop.from_1_bits_1_inst[31:0]
+@1401200
+-Decode
+@c00201
+-commit
+@200
+-debug0
+@22
+[color] 2
++{pc} TOP.mycpu_top.core.CommitTop.io_debug_0_wb_pc[31:0]
++{we} TOP.mycpu_top.core.CommitTop.io_debug_0_wb_rf_we[3:0]
++{wnum} TOP.mycpu_top.core.CommitTop.io_debug_0_wb_rf_wnum[4:0]
++{wdata} TOP.mycpu_top.core.CommitTop.io_debug_0_wb_rf_wdata[31:0]
+@200
+-debug1
+@22
+[color] 2
++{pc} TOP.mycpu_top.core.CommitTop.io_debug_1_wb_pc[31:0]
++{we} TOP.mycpu_top.core.CommitTop.io_debug_1_wb_rf_we[3:0]
++{wnum} TOP.mycpu_top.core.CommitTop.io_debug_1_wb_rf_wnum[4:0]
++{wdata} TOP.mycpu_top.core.CommitTop.io_debug_1_wb_rf_wdata[31:0]
+@1401201
+-commit
+@28
+TOP.mycpu_top.aclk
+@22
+[color] 2
+TOP.mycpu_top.debug_wb_pc[31:0]
+TOP.mycpu_top.debug_wb_rf_wdata[31:0]
+TOP.mycpu_top.debug_wb_rf_we[3:0]
+TOP.mycpu_top.debug_wb_rf_wnum[4:0]
 [pattern_trace] 1
 [pattern_trace] 0
