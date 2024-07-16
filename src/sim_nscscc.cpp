@@ -346,7 +346,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
         cemu_confreg.set_switch(test);
         top->aresetn = 0;
         std::stringstream ss;
-        ss << "trace-perf-" << test << ".vcd";
+        ss << "trace-perf-" << test << ".fst";
         if (trace_on)
             vcd.open(ss.str().c_str());
         uint64_t rst_ticks = 100;
