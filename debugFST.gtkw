@@ -1,0 +1,183 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Tue Jul 16 12:17:38 2024
+[*]
+[dumpfile] "/home/yuxuaan/NoAXI-LoongArch/NoAXI-LoongArch-CPU-OOO/NoAXI-LoongArch-CPU/soc-simulator-axi/trace-perf-1.fst"
+[dumpfile_mtime] "Mon Jul 15 13:11:22 2024"
+[dumpfile_size] 78856197
+[savefile] "/home/yuxuaan/NoAXI-LoongArch/NoAXI-LoongArch-CPU-OOO/NoAXI-LoongArch-CPU/soc-simulator-axi/debugFST.gtkw"
+[timestart] 3767372
+[size] 2548 1335
+[pos] 32766 32796
+*-6.000000 4135874 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.mycpu_top.
+[treeopen] TOP.mycpu_top.core.
+[treeopen] TOP.mycpu_top.core.Memory2Top.
+[treeopen] TOP.mycpu_top.core.StoreBuffer.
+[sst_width] 371
+[signals_width] 780
+[sst_expanded] 1
+[sst_vpaned_height] 549
+@800200
+-mem 0
+@22
+[color] 2
+TOP.mycpu_top.core.Memory0Top.raw_1_pc[31:0]
+@28
+[color] 1
+TOP.mycpu_top.core.Memory0Top.raw_1_actualStore
+@22
+TOP.mycpu_top.core.Memory0Top.raw_1_writeInfo_requestInfo_addr[31:0]
+@1000200
+-mem 0
+@800200
+-mem 1
+@22
+[color] 2
+TOP.mycpu_top.core.Memory1Top.raw_1_pc[31:0]
+@28
+[color] 1
+TOP.mycpu_top.core.Memory1Top.raw_1_actualStore
+@22
+TOP.mycpu_top.core.Memory1Top.io_dCache_addr[31:0]
+@28
+TOP.mycpu_top.core.Memory1Top.io_storeBuffer_forwardHit
+@1000200
+-mem 1
+@800200
+-mem 2
+@22
+[color] 2
+TOP.mycpu_top.core.Memory2Top.raw_1_pc[31:0]
+@28
+[color] 1
+TOP.mycpu_top.core.Memory2Top.raw_1_actualStore
+@22
+TOP.mycpu_top.core.Memory2Top.loadData[31:0]
+@28
+TOP.mycpu_top.core.Memory2Top.io_dCache_request_valid
+@22
+TOP.mycpu_top.core.Memory2Top.io_dCache_request_bits_addr[31:0]
+@28
+TOP.mycpu_top.core.Memory2Top.io_dCache_hitVec_0
+@22
+TOP.mycpu_top.core.Memory2Top.io_dCache_answer_bits[31:0]
+@200
+-
+@28
+TOP.mycpu_top.core.Memory2Top.raw_1_storeBufferHit
+@22
+TOP.mycpu_top.core.Memory2Top.raw_1_storeBufferHitData[31:0]
+@200
+-
+@28
+TOP.mycpu_top.core.Memory2Top.busy
+TOP.mycpu_top.core.Memory2Top.io_dCache_answer_valid
+@22
+TOP.mycpu_top.core.Memory2Top.io_dCache_answer_bits[31:0]
+@28
+TOP.mycpu_top.core.Memory2Top.io_dCache_request_valid
+@200
+-
+@c00024
+[color] 2
+TOP.mycpu_top.core.DCache.state[2:0]
+@28
+(0)TOP.mycpu_top.core.DCache.state[2:0]
+(1)TOP.mycpu_top.core.DCache.state[2:0]
+(2)TOP.mycpu_top.core.DCache.state[2:0]
+@1401200
+-group_end
+@200
+-
+@28
+TOP.mycpu_top.core.DCache.io_axi_ar_valid
+TOP.mycpu_top.core.DCache.io_axi_ar_ready
+@22
+TOP.mycpu_top.core.DCache.io_axi_ar_bits_addr[31:0]
+@200
+-
+@28
+TOP.mycpu_top.core.DCache.io_axi_r_ready
+TOP.mycpu_top.core.DCache.io_axi_r_valid
+TOP.mycpu_top.core.DCache.io_axi_r_bits_last
+@22
+TOP.mycpu_top.core.DCache.io_axi_r_bits_data[31:0]
+@200
+-
+@28
+TOP.mycpu_top.core.DCache.io_axi_aw_ready
+TOP.mycpu_top.core.DCache.io_axi_aw_valid
+@22
+TOP.mycpu_top.core.DCache.io_axi_w_bits_strb[3:0]
+TOP.mycpu_top.core.DCache.io_axi_aw_bits_addr[31:0]
+@200
+-
+@28
+TOP.mycpu_top.core.DCache.io_axi_w_valid
+TOP.mycpu_top.core.DCache.io_axi_w_ready
+@22
+TOP.mycpu_top.core.DCache.io_axi_w_bits_data[31:0]
+@28
+TOP.mycpu_top.core.DCache.io_axi_b_valid
+@1000200
+-mem 2
+@800200
+-storeBuffer
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_0_requestInfo_addr[31:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_0_requestInfo_cached
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_0_requestInfo_wdata[31:0]
+TOP.mycpu_top.core.StoreBuffer.mem_0_requestInfo_wstrb[3:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_0_valid
+@200
+-
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_1_requestInfo_addr[31:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_1_requestInfo_cached
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_1_requestInfo_wdata[31:0]
+TOP.mycpu_top.core.StoreBuffer.mem_1_requestInfo_wstrb[3:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_1_valid
+@200
+-
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_2_requestInfo_addr[31:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_2_requestInfo_cached
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_2_requestInfo_wdata[31:0]
+TOP.mycpu_top.core.StoreBuffer.mem_2_requestInfo_wstrb[3:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_2_valid
+@200
+-
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_3_requestInfo_addr[31:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_3_requestInfo_cached
+@22
+TOP.mycpu_top.core.StoreBuffer.mem_3_requestInfo_wdata[31:0]
+TOP.mycpu_top.core.StoreBuffer.mem_3_requestInfo_wstrb[3:0]
+@28
+TOP.mycpu_top.core.StoreBuffer.mem_3_valid
+@1000200
+-storeBuffer
+@c00200
+-debug
+@22
+[color] 2
+TOP.debug_wb_pc[31:0]
+TOP.debug_wb_rf_we[3:0]
+TOP.debug_wb_rf_wnum[4:0]
+TOP.debug_wb_rf_wdata[31:0]
+@1401200
+-debug
+[pattern_trace] 1
+[pattern_trace] 0

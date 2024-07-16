@@ -1,5 +1,6 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
+#include "verilated_fst_c.h"
 #include "Vmycpu_top.h"
 
 #include "axi4.hpp"
@@ -110,7 +111,8 @@ void func_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref)
     assert(mmio.add_dev(0x1faf0000, 0x10000, &confreg));
 
     // connect Vcd for trace
-    VerilatedVcdC vcd;
+    // VerilatedVcdC vcd;
+    VerilatedFstC vcd;
     if (trace_on)
     {
         top->trace(&vcd, 0);
@@ -189,7 +191,8 @@ void perf_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_start = 1
     assert(mmio.add_dev(0x1faf0000, 0x10000, &confreg));
 
     // connect Vcd for trace
-    VerilatedVcdC vcd;
+    // VerilatedVcdC vcd;
+    VerilatedFstC vcd;
     if (trace_on)
     {
         top->trace(&vcd, 0);
@@ -293,7 +296,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     assert(mmio.add_dev(0x1faf0000, 0x10000, &confreg));
 
     // connect Vcd for trace
-    VerilatedVcdC vcd;
+    // VerilatedVcdC vcd;
+    VerilatedFstC vcd;
     if (trace_on)
     {
         top->trace(&vcd, 0);
@@ -385,7 +389,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 sim_time--;
             }
             // trace with cemu {
-            if ( top->debug_wb_rf_we && top->debug_wb_rf_wnum)
+            if (top->debug_wb_rf_we && top->debug_wb_rf_wnum)
             // if (top->aclk && top->debug_wb_rf_we && top->debug_wb_pc != last_commit_pc)
             {
                 do
@@ -559,7 +563,8 @@ void ucore_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref)
     assert(mmio.add_dev(0x1fe40000, 0x10000, &uart));
 
     // connect Vcd for trace
-    VerilatedVcdC vcd;
+    // VerilatedVcdC vcd;
+    VerilatedFstC vcd;
     if (trace_on)
     {
         top->trace(&vcd, 0);
