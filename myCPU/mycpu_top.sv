@@ -47,7 +47,11 @@ module mycpu_top(
     output wire [31:0] debug_wb_pc,
     output wire [ 3:0] debug_wb_rf_we,
     output wire [ 4:0] debug_wb_rf_wnum,
-    output wire [31:0] debug_wb_rf_wdata
+    output wire [31:0] debug_wb_rf_wdata,
+
+    // statistics interface
+    output wire [31:0] branch_succeed_times,
+    output wire [31:0] branch_total_times
 );
 Top core(
     .clock                  (aclk),
@@ -97,6 +101,9 @@ Top core(
     .io_debug_wb_pc         (debug_wb_pc),
     .io_debug_wb_rf_we     (debug_wb_rf_we),
     .io_debug_wb_rf_wnum    (debug_wb_rf_wnum),
-    .io_debug_wb_rf_wdata   (debug_wb_rf_wdata)
+    .io_debug_wb_rf_wdata   (debug_wb_rf_wdata),
+
+    .io_statistic_branch_succeed_time (branch_succeed_times),
+    .io_statistic_branch_total_time   (branch_total_times)
 );
 endmodule

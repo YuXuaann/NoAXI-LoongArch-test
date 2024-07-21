@@ -338,6 +338,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     uint64_t last_commit_pc = 0;
     int inst_count = 0;
     int cycles = 0;
+    int branch_succeed_time[12] = {0};
+    int branch_total_time[12] = {0};
 
     for (int test = test_start; test <= test_end && running; test++)
     {
@@ -381,6 +383,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
             if (top->aresetn && top->debug_wb_pc == 0x1c000100u)
             {
                 printf("\e[32mTest PASS !!!\e[0m\n");
+                branch_succeed_time[test - 1] = top->branch_succeed_times;
+                branch_total_time[test - 1] = top->branch_total_times;
                 test_end = true;
             }
             if (trace_on)
@@ -389,7 +393,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 sim_time--;
             }
             // trace with cemu {
-            if (top->debug_wb_rf_we && top->debug_wb_rf_wnum)
+            if (top->debug_wb_rf_we && top->debug_wb_rf_wnum && top->debug_wb_pc != 0x1c000104u)
             // if (top->aclk && top->debug_wb_rf_we && top->debug_wb_pc != last_commit_pc)
             {
                 do
@@ -511,11 +515,26 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
         0x853B00,
         0x50A1BCC,
     };
+
+    static const char *test_name[10] = {
+        "bitcount",
+        "bubble_sort",
+        "coremark",
+        "crc32",
+        "dhrystone",
+        "quick_sort",
+        "select_sort",
+        "sha",
+        "stream_copy",
+        "stringsearch",
+    };
     double mulscores = 1;
     printf("==================scores===================\n");
     for (int test = test_start; test <= test_end; test++)
     {
-        printf("%.3f\n", ref_scores[test - 1] * 1.0 / dut_scores[test - 1]);
+        printf("test: %d-%s: %.3f\n", test, test_name[test - 1], ref_scores[test - 1] * 1.0 / dut_scores[test - 1]);
+        printf("branch succeed rate: %.3f %\n", branch_succeed_time[test - 1] * 1.0 / branch_total_time[test - 1] * 100);
+        printf("branch total times: %d\n\n", branch_total_time[test - 1]);
         mulscores *= ref_scores[test - 1] * 1.0 / dut_scores[test - 1];
     }
     if (test_end)
@@ -523,8 +542,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
         printf("scores = %.3f\n", std::pow(mulscores, 0.1));
     }
     printf("=================IPC=====================\n");
-    printf("total insts  = %lu\n", inst_count);
-    printf("total cycles = %lu\n", cycles);
+    printf("total insts  = %u\n", inst_count);
+    printf("total cycles = %u\n", cycles);
     printf("IPC = %.4f\n", inst_count * 1.0 / cycles);
     printf("=========================================\n");
     printf("\e[34mperf test done!\e[0m\n");
