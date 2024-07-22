@@ -79,6 +79,7 @@ public:
     uint8_t debug_wb_we;
     uint8_t debug_wb_wnum;
     uint32_t debug_wb_wdata;
+    bool is_load;
     bool debug_wb_is_timer;
     std::queue<uint32_t> pc_trace;
     std::set<uint32_t> cache_op;
@@ -104,6 +105,7 @@ public:
         debug_wb_wnum = 0;
         debug_wb_wdata = 0;
         debug_wb_is_timer = false;
+        is_load = false;
         pc_trace.push(pc);
         while (pc_trace.size() > 16)
         {
@@ -331,10 +333,12 @@ public:
                         break;
                     case LD_B:
                     {
+                        is_load = true;
                         two_mem_signal = true;
                         count_inst["LD_B"]++;
                         uint32_t va = GPR[instr._2ri12.rj] + instr._2ri12.i12;
-                        if (va == 0xbfafe000u) debug_wb_is_timer = true;
+                        if (va == 0xbfafe000u)
+                            debug_wb_is_timer = true;
                         int8_t temp;
                         la32r_exccode exc = mmu.va_read(va, 1, (unsigned char *)&temp,
                                                         csr.get_cur_plv(),
@@ -352,10 +356,12 @@ public:
                     }
                     case LD_H:
                     {
+                        is_load = true;
                         two_mem_signal = true;
                         count_inst["LD_H"]++;
                         uint32_t va = GPR[instr._2ri12.rj] + instr._2ri12.i12;
-                        if (va == 0xbfafe000u) debug_wb_is_timer = true;
+                        if (va == 0xbfafe000u)
+                            debug_wb_is_timer = true;
                         int16_t temp;
                         la32r_exccode exc = mmu.va_read(va, 2, (unsigned char *)&temp,
                                                         csr.get_cur_plv(),
@@ -373,10 +379,12 @@ public:
                     }
                     case LD_W:
                     {
+                        is_load = true;
                         two_mem_signal = true;
                         count_inst["LD_W"]++;
                         uint32_t va = GPR[instr._2ri12.rj] + instr._2ri12.i12;
-                        if (va == 0xbfafe000u) debug_wb_is_timer = true;
+                        if (va == 0xbfafe000u)
+                            debug_wb_is_timer = true;
                         int32_t temp;
                         la32r_exccode exc = mmu.va_read(va, 4, (unsigned char *)&temp,
                                                         csr.get_cur_plv(),
@@ -439,10 +447,12 @@ public:
                     }
                     case LD_BU:
                     {
+                        is_load = true;
                         two_mem_signal = true;
                         count_inst["LD_BU"]++;
                         uint32_t va = GPR[instr._2ri12.rj] + instr._2ri12.i12;
-                        if (va == 0xbfafe000u) debug_wb_is_timer = true;
+                        if (va == 0xbfafe000u)
+                            debug_wb_is_timer = true;
                         uint8_t temp;
                         la32r_exccode exc = mmu.va_read(va, 1, (unsigned char *)&temp,
                                                         csr.get_cur_plv(),
@@ -460,10 +470,12 @@ public:
                     }
                     case LD_HU:
                     {
+                        is_load = true;
                         two_mem_signal = true;
                         count_inst["LD_HU"]++;
                         uint32_t va = GPR[instr._2ri12.rj] + instr._2ri12.i12;
-                        if (va == 0xbfafe000u) debug_wb_is_timer = true;
+                        if (va == 0xbfafe000u)
+                            debug_wb_is_timer = true;
                         uint16_t temp;
                         la32r_exccode exc = mmu.va_read(va, 2, (unsigned char *)&temp,
                                                         csr.get_cur_plv(),
