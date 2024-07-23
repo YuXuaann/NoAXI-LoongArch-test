@@ -89,12 +89,12 @@ void uart_input(uart8250 &uart)
         uart.putc(c);
     }
 }
-
+int seed = 0;
 void func_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref)
 {
     axi4<32, 32, 4> mmio_sigs;
     axi4_ref<32, 32, 4> mmio_sigs_ref(mmio_sigs);
-    axi4_xbar<32, 32, 4> mmio(23);
+    axi4_xbar<32, 32, 4> mmio(seed);
 
     // func mem at 0x1fc00000 and 0x0
     mmio_mem perf_mem(262144 * 4, "./test-set/test_bin/main.bin");
@@ -284,7 +284,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     axi4<32, 32, 4> mmio_sigs;
     axi4_ref<32, 32, 4> mmio_sigs_ref(mmio_sigs);
     // axi4_xbar<32, 32, 4> mmio(axi_fast ? 0 : 2);
-    axi4_xbar<32, 32, 4> mmio(500);
+    axi4_xbar<32, 32, 4> mmio(2);
 
     // perf mem at 0x1fc00000
     mmio_mem perf_mem(262144 * 4, "./test-set/test_bin/main.bin");
@@ -341,6 +341,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     int cycles = 0;
     int branch_succeed_time[12] = {0};
     int branch_total_time[12] = {0};
+    uint8_t timer_reg = -1;
 
     for (int test = test_start; test <= test_end && running; test++)
     {
@@ -386,13 +387,19 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 printf("\e[32mTest PASS !!!\e[0m\n");
                 branch_succeed_time[test - 1] = top->branch_succeed_times;
                 branch_total_time[test - 1] = top->branch_total_times;
-                // test_end = true;
-                return;
+                test_end = true;
             }
             if (trace_on)
             {
                 vcd.dump(ticks);
                 sim_time--;
+            }
+            // update timer
+            if (top->ld_debug_wb_rf_we && timer_reg == top->ld_debug_wb_rf_wnum)
+            {
+                // printf("wb_rf_wnum = %02x, wb_rf_wdata = %08x\e[0m\n", top->ld_debug_wb_rf_wnum, top->ld_debug_wb_rf_wdata);
+                cemu_la32r.set_GPR(timer_reg, top->ld_debug_wb_rf_wdata);
+                timer_reg = -1;
             }
             // trace with cemu {
             if (top->debug_wb_rf_we && top->debug_wb_rf_wnum && top->debug_wb_pc != 0x1c000104u)
@@ -436,8 +443,17 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                     last_pc = cemu_la32r.debug_wb_pc;
                     last_wnum = cemu_la32r.debug_wb_wnum;
                     last_wdata = cemu_la32r.debug_wb_wdata;
+
+                    if (cemu_la32r.debug_wb_wnum == timer_reg)
+                    {
+                        timer_reg = -1;
+                    }
+
                     if (cemu_la32r.debug_wb_is_timer)
                     {
+                        // printf("reference: PC = %08x, wb_rf_wnum = %02x, wb_rf_wdata = %08x\n", cemu_la32r.debug_wb_pc, cemu_la32r.debug_wb_wnum, cemu_la32r.debug_wb_wdata);
+                        timer_reg = cemu_la32r.debug_wb_wnum;
+                        // printf("timer_reg = %u\n", timer_reg);
                         cemu_la32r.set_GPR(cemu_la32r.debug_wb_wnum, top->debug_wb_rf_wdata);
                     }
 
@@ -743,8 +759,15 @@ int main(int argc, char **argv, char **env)
     switch (run_mode)
     {
     case FUNC:
-        func_run(top, mmio_ref);
+    {
+        for (int i = 0; i < 30; i++)
+        {
+            running = true;
+            seed = i;
+            func_run(top, mmio_ref);
+        }
         break;
+    }
     case PERF:
         if (trace_on && perf_start != perf_end)
         {
