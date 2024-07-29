@@ -22,8 +22,10 @@
 #include <unordered_map>
 
 FILE *inst_file = fopen("test-set/inst/insts.txt", "w");
+FILE *perf_file = fopen("perf_out.txt", "w");
 
-bool only_cemu = false;
+bool only_cemu = false; // 是否仅为模拟器
+bool perf_out = true;   // 是否输出perf信息
 
 void connect_wire(axi4_ptr<32, 32, 4> &mmio_ptr, Vmycpu_top *top)
 {
@@ -284,7 +286,7 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     axi4<32, 32, 4> mmio_sigs;
     axi4_ref<32, 32, 4> mmio_sigs_ref(mmio_sigs);
     // axi4_xbar<32, 32, 4> mmio(axi_fast ? 0 : 2);
-    axi4_xbar<32, 32, 4> mmio(2);
+    axi4_xbar<32, 32, 4> mmio(3);
 
     // perf mem at 0x1fc00000
     mmio_mem perf_mem(262144 * 4, "./test-set/test_bin/main.bin");
@@ -341,6 +343,10 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     int cycles = 0;
     int branch_succeed_time[12] = {0};
     int branch_total_time[12] = {0};
+    int iCache_total_time[12] = {0};
+    int iCache_succeed_time[12] = {0};
+    int dCache_total_time[12] = {0};
+    int dCache_succeed_time[12] = {0};
     uint8_t timer_reg = -1;
 
     for (int test = test_start; test <= test_end && running; test++)
@@ -387,6 +393,10 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                 printf("\e[32mTest PASS !!!\e[0m\n");
                 branch_succeed_time[test - 1] = top->branch_succeed_times;
                 branch_total_time[test - 1] = top->branch_total_times;
+                iCache_succeed_time[test - 1] = top->iCache_succeed_times;
+                iCache_total_time[test - 1] = top->iCache_total_times;
+                dCache_succeed_time[test - 1] = top->dCache_succeed_times;
+                dCache_total_time[test - 1] = top->dCache_total_times;
                 test_end = true;
             }
             if (trace_on)
@@ -421,6 +431,8 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
                     printf("mycpu    : PC = %08x, wb_rf_wnum = %02x, wb_rf_wdata = %08x\e[0m\n", top->debug_wb_pc, top->debug_wb_rf_wnum, top->debug_wb_rf_wdata);
                     printf("--------------------------------------------------------------------------at hex-\n");
                     running = false;
+
+                    printf("delay: %d\n", seed);
                     // FILE *fp = fopen("/mnt/f/CPU/lab_Loongarch/mycpu_env/func/obj/test.s", "r");
                     // char inst[100];
                     // while (fscanf(fp, "%s", inst) != EOF)
@@ -557,7 +569,19 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     {
         printf("test: %d-%s: %.3f\n", test, test_name[test - 1], ref_scores[test - 1] * 1.0 / dut_scores[test - 1]);
         printf("branch succeed rate: %.3f %\n", branch_succeed_time[test - 1] * 1.0 / branch_total_time[test - 1] * 100);
-        printf("branch total times: %d\n\n", branch_total_time[test - 1]);
+        printf("branch total times: %d\n", branch_total_time[test - 1]);
+        // printf("iCache hit rate: %.3f %\n", iCache_succeed_time[test - 1] * 1.0 / iCache_total_time[test - 1] * 100);
+        // printf("iCache request times: %d\n", iCache_total_time[test - 1]);
+        // printf("dCache hit rate: %.3f %\n", dCache_succeed_time[test - 1] * 1.0 / dCache_total_time[test - 1] * 100);
+        // printf("dCache request times: %d\n", dCache_total_time[test - 1]);
+        printf("\n");
+        if (perf_out)
+        {
+            fprintf(perf_file, "test: %d-%s: %.3f\n", test, test_name[test - 1], ref_scores[test - 1] * 1.0 / dut_scores[test - 1]);
+            fprintf(perf_file, "branch succeed rate: %.3f %\n", branch_succeed_time[test - 1] * 1.0 / branch_total_time[test - 1] * 100);
+            fprintf(perf_file, "branch total times: %d\n", branch_total_time[test - 1]);
+            fprintf(perf_file, "\n");
+        }
         mulscores *= ref_scores[test - 1] * 1.0 / dut_scores[test - 1];
     }
     if (test_end)
@@ -570,6 +594,15 @@ void cemu_perf_diff(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref, int test_sta
     printf("IPC = %.4f\n", inst_count * 1.0 / cycles);
     printf("=========================================\n");
     printf("\e[34mperf test done!\e[0m\n");
+
+    if (perf_out)
+    {
+        fprintf(perf_file, "=================IPC=====================\n");
+        fprintf(perf_file, "total insts  = %u\n", inst_count);
+        fprintf(perf_file, "total cycles = %u\n", cycles);
+        fprintf(perf_file, "IPC = %.4f\n", inst_count * 1.0 / cycles);
+        fprintf(perf_file, "=========================================\n\n");
+    }
 }
 
 void ucore_run(Vmycpu_top *top, axi4_ref<32, 32, 4> &mmio_ref)
@@ -784,7 +817,11 @@ int main(int argc, char **argv, char **env)
         {
             printf("diff uart is on\n");
         }
-        cemu_perf_diff(top, mmio_ref, perf_start, perf_end);
+        for (int i = 1; i <= 10; i++)
+        {
+            perf_start = perf_end = i;
+            cemu_perf_diff(top, mmio_ref, perf_start, perf_end);
+        }
         break;
     case UCORE:
         ucore_run(top, mmio_ref);

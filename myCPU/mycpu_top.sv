@@ -52,6 +52,10 @@ module mycpu_top(
     // statistics interface
     output wire [31:0] branch_succeed_times,
     output wire [31:0] branch_total_times,
+    output wire [31:0] iCache_total_times,
+    output wire [31:0] iCache_succeed_times,
+    output wire [31:0] dCache_total_times,
+    output wire [31:0] dCache_succeed_times,
 
     // load debug interface
     output wire [31:0] ld_debug_wb_pc,
@@ -114,7 +118,11 @@ Top core(
     .io_debug_uncached_wb_rf_wnum    (ld_debug_wb_rf_wnum),
     .io_debug_uncached_wb_rf_wdata   (ld_debug_wb_rf_wdata),
 
+    .io_statistic_branch_total_time   (branch_total_times),
     .io_statistic_branch_succeed_time (branch_succeed_times),
-    .io_statistic_branch_total_time   (branch_total_times)
+    .io_statistic_iCache_total_time   (iCache_total_times),
+    .io_statistic_iCache_succeed_time (iCache_succeed_times),
+    .io_statistic_dCache_total_time   (dCache_total_times),
+    .io_statistic_dCache_succeed_time (dCache_succeed_times)
 );
 endmodule
